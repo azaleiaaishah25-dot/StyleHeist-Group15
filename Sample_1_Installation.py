@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 
-screen = pygame.display.set_mode((1920, 1080))
+screen = pygame.display.set_mode((1600, 900))
 pygame.display.set_caption("My First Game")
 
 running = True
