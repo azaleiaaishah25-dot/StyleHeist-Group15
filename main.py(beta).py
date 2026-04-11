@@ -2,6 +2,7 @@ import pygame
 
 pygame.init() #"master switch" 
 
+
 tile_size = 50
 
 game_map = [
@@ -35,22 +36,27 @@ while running: #game is still live if still running
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    screen.fill((20, 20, 30))
     
     for row_index, row in enumerate(game_map):
         for col_index, tile in enumerate(row):
             x = col_index * tile_size
-            y = col_index * tile_size
+            y = row_index * tile_size
 
             if tile == "1":
-                color = (120, 120, 120) #wall
-            elif tile == "2":
-                color = (255, 0, 0) #something la
+                color = (90, 90, 90)
             else:
-                color = (40, 40, 40) #floorrrr
-                
+                color = (200, 200, 200)
+
             pygame.draw.rect(screen, color, (x,y, tile_size, tile_size))
+            pygame.draw.rect(screen, (0, 0, 0), (x, y, tile_size, tile_size), 1)
+    #Draw
+    pygame.draw.rect(screen, (0, 255, 0), (player_x, player_y, player_size, player_size))
 
-
+    pygame.display.update()
+           
+    running = True
     def check_collision(x, y):
         player_rect = pygame.Rect(x, y, player_size, player_size)
 
@@ -83,21 +89,17 @@ while running: #game is still live if still running
     if hotkeys[pygame.K_d]:
         new_x += speed
 
-    if not check_collision(new_x, new_y):
+    #Move X
+    if not check_collision(new_x, player_y):
         player_x = new_x
+
+    #Move Y
+    if not check_collision(player_x, new_y):
         player_y = new_y
-
-    #Draw
-    screen.fill((30, 30, 30)) #background is an RGB (red, green, blue)
-    pygame.draw.rect(screen, (0, 255, 0), (player_x, player_y, player_size, player_size))
-
-    pygame.display.update()
 
 #2D game from python feels like minecraft world but with blocks
 #Example: 111111 - wall
 #sample test 1 with tile_size
-
-
 
 pygame.quit()
 
