@@ -2,9 +2,6 @@ import pygame
 
 pygame.init() #"master switch" 
 
-
-
-
 tile_size = 50
 
 game_map = [
@@ -14,8 +11,8 @@ game_map = [
     "100011111110000001",
     "100330000000000001",
     "111110000000111111",   
-    "000000000000000000",   #Outside Area
-    "000033300000000000",   #3 is trees
+    "000000000000000000",   #3 is trees, 4 is Next Entrance, 5 is NPC
+    "000033300000050000",   
     "000000000003300000",
     "110000011000011000",
     "11110001111111101111",
@@ -24,14 +21,14 @@ game_map = [
     "1114000000003111111"
 ]
 
-
-#screen aka display
-WIDTH, HEIGHT = 1200, 720 #Dimensions
+#sScreen
+WIDTH, HEIGHT = 1200, 720  #Dimensions
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) #window, open physical window. Takes a tuple
 pygame.display.set_caption("2D Game") #Window with name, cosmetic
 
-#Player aka Character
+#Player 
 #player_x / player_y = player variable
+player_size = tile_size
 player_size = 50
 player_x = 100
 player_y = 100
@@ -39,14 +36,24 @@ speed = 5 #pixels per movements in a frame = FPS
 
 clock = pygame.time.Clock() #limit the pc fps 
 
-player_size = tile_size
-
+#Images
 duck_img = pygame.image.load("Images/duck_with_knife.jpg").convert_alpha()
 duck_img = pygame.transform.scale(duck_img, (player_size, player_size))
 
 tree_img = pygame.image.load("Images/pixel_tree.jpg").convert_alpha()
 tree_img = pygame.transform.scale(tree_img, (tile_size, tile_size))
 
+#NPC for MAP
+npc_positions = []
+for row_index, row in enumerate(game_map):
+    for col_index, tile in enumerate(row):
+        if tile == "5":
+            npc_positions.append((col_index * tile_size, row_index * tile_size))
+
+#Font
+font = pygame.font.SysFont(None, 30)
+
+ 
 running = True
 while running: #game is still live if still running
     clock.tick(60) #fps, frame per second
@@ -70,7 +77,7 @@ while running: #game is still live if still running
             
             elif tile == "4":
                 pygame.draw.rect(screen, (200,150,50), (x,y, tile_size, tile_size))
-
+           
 
             else:
                 pygame.draw.rect(screen, (200,200,200), (x, y, tile_size, tile_size))
@@ -79,13 +86,33 @@ while running: #game is still live if still running
            
             pygame.draw.rect(screen, (0, 0, 0), (x, y, tile_size, tile_size), 1)
             
+npc_size = tile_size
+npc_x = 400
+npc_y = 300
+
+font = pygame.font.SysFont(None, 30)
+interacting = False
+
+player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
+npc_rect = pygame.Rect(npc_x, npc_y, npc_size, npc_size)
+
+keys = pygame.key.get_pressed()
+
+if player_rect.colliderect(npc_rect):
+    if keys[pygame.K_e]:
+        interacting = True
+    else:
+        interacting = False
+
+        if interacting:
+            text = font.render("WELCOME TO THE GAME!", True, (255, 255, 255))
+            screen.blit(text, (50, 50))
             
     #Draw
     screen.blit(duck_img, (player_x, player_y))
 
     pygame.display.update()
            
-    running = True
     def check_collision(x, y):
         player_rect = pygame.Rect(x, y, player_size, player_size)
 
@@ -130,7 +157,7 @@ player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
 
 
 for row_index, row in enumerate(game_map):
-    for col_index, tile in enumerate(game_map):
+    for col_index, tile in enumerate(row):
         if tile == "4":
             tile_rect = pygame.Rect(
                 col_index * tile_size,
