@@ -169,6 +169,12 @@ while running:
     camera_x = player_x - (WIDTH // 2)
     camera_y = player_y - (HEIGHT // 2)
 
+    map_pixel_width = len(game_map[0]) * tile_size
+    map_pixel_height = len(game_map) * tile_size
+
+    camera_x = max(0, min(camera_x, map_pixel_width - WIDTH))
+    camera_y = max(0, min(camera_y, map_pixel_height - HEIGHT))
+
     player_col = player_x // tile_size
     player_row = player_y // tile_size
 
@@ -188,6 +194,7 @@ while running:
             if tile == "4":
                 portal_rect = pygame.Rect(col_index * tile_size, row_index * tile_size, tile_size, tile_size)
                 if player_rect.colliderect(portal_rect):
+
                     #Scenes to Scenes
                     if current_era == "Museum":
                         current_era = "1920s"
@@ -195,6 +202,9 @@ while running:
                     else:
                         current_era = "Museum"
                         game_map = museum_map
+                    #Reset the Fog
+                    #Blackout map for the second era
+                    visited_map = [[False for _ in range(len(game_map[0]))] for _ in range(len(game_map))]
 
                     player_x, player_y = 1800, 900
                     
