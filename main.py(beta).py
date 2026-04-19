@@ -5,7 +5,7 @@ pygame.init()
 
 #1. Setup & Variables
 tile_size = 60
-WIDTH, HEIGHT = 1920, 1080 
+WIDTH, HEIGHT = 1920, 1080 #Resolution Full HD
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
 pygame.display.set_caption("Style Heist - Detective Game")
 clock = pygame.time.Clock() #limit the pc fps 
@@ -14,7 +14,7 @@ font = pygame.font.SysFont(None, 30)
 
 #2. The Maps (Scene to Scene)
 museum_map = [
-    "111111111111111111111111111111111111111111111111111111111111",
+    "111111111111111111111111111111111111111111111111111111111111", #1 is wall, 3 is tree(temporary), 4 is teleportation
     "100000000000000000000000000011110000000000000000000000000001",
     "100050000000000000000000000011110000000000000000000500000001",
     "100000000333000003330000000000000000000333000003330000000001",
@@ -270,5 +270,9 @@ while running:
 
 pygame.quit()
 
-
+#4/19/2026 and Earlier dates
+#Summary on what I have done in my part for the games:
+#Refactored the Architecture, Resolution Upgrade
+#Mega Map Installation, Museum and 1920s Jazz Age, Scrolling Camera, Camera Clamping
+#Teleportation System, Fog of War Mini-Map, Scene Transitions
 
