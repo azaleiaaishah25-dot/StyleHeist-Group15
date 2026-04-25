@@ -479,6 +479,9 @@ while running:
     pygame.display.flip()
     clock.tick(60)
 
+    era_label = font.render(f"TIMELINE: {current_era}", True, (255, 255, 0)) #Yellow Color
+    screen.blit(era_label, (20, 20))
+
     pygame.display.update()
 
 pygame.quit()
