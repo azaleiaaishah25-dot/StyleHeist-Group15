@@ -398,8 +398,8 @@ while running:
 
                         player_x, player_y = 1800, 90
                         pygame.time.delay(200)
-
                         break
+                        
                     
     #D. Drawing
     screen.fill((10, 20, 20))
