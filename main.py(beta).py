@@ -11,6 +11,7 @@ pygame.display.set_caption("Style Heist - Detective Game")
 clock = pygame.time.Clock() #limit the pc fps 
 font = pygame.font.SysFont(None, 30)
 
+seen_self_dialogues = set()
 dialogue_active = False
 current_dialogue = []
 dialogue_index = 0
@@ -289,6 +290,13 @@ building_data = {
 current_era = "Museum"
 game_map = museum_map #Starting at the Museum
 
+if current_era == "1920s" and "first_1920s" not in seen_self_dialogues:
+    start_dialogue([
+        "So this is the 1920s...",
+        "The whole place feels different from the museum."
+    ])
+    seen_self_dialogues.add("first_1920s")
+
 #Fog of war 
 visited_map = [[False for _ in range(len(museum_map[0]))] for _ in range(len(museum_map))]
 
@@ -335,6 +343,16 @@ def transition_to(new_map_array, new_era_name, spawn_tile_x, spawn_tile_y):
     
     pygame.time.delay(250)
 
+def start_dialogue(lines):
+    global dialogue_active, current_dialogue, dialogue_index
+    global dialogue_text_shown, text_counter
+
+    current_dialogue = lines
+    dialogue_active = True
+    dialogue_index = 0
+    dialogue_text_shown = ""
+    text_counter = 0
+
 #6. Main Game Loop
 running = True
 while running: 
@@ -377,6 +395,16 @@ while running:
                         if dialogue_index >= len(current_dialogue):
                             dialogue_active = False
 
+            if event.key == pygame.K_q:
+                if not dialogue_active:
+                    start_dialogue([
+                        "..First night shift alone.",
+                        "..No backup, no walkthroughs..just me.",
+                        "This place used to be smaller ... just a gallery.",
+                        "Now it’s a full museum ... every era, every style...",
+                        "..He really built all of this from scratch."
+                     ])
+                    
     if not dialogue_active:
         hotkeys = pygame.key.get_pressed()
 
