@@ -38,6 +38,7 @@ dialogue_data = {
     }
 }
 
+
 #2. The Maps (Scene to Scene)
 # --- 2. THE MAPS (MUSEUM - RE-RE-REDESIGN) ---
 # I have cleared a massive 10x10 square around Column 30, Row 15.
@@ -91,7 +92,7 @@ era_1920s_map = [
     "100000000000000000000000000001",
     "101111111000000000011111111101", 
     "101111111000030000011111111101",
-    "101117711000000000011188111101", 
+    "101112211000000000011122111101", 
     "100000000000000000000000000001", 
     "100000000000050000000000000001", 
     "100000000000000000000000000001",
@@ -100,7 +101,7 @@ era_1920s_map = [
     "100000000000000000000000000001",
     "100000000000000000050000000001", 
     "100000000000000000000000000001", 
-    "101112211000000000011199111101", 
+    "101112211000000000011122111101", 
     "101111111000030000011111111101", 
     "101111111000000000011111111101",
     "100000000000000000000000000001",
@@ -229,6 +230,35 @@ era_1990s_map = [
     "100000000000000000000000000001",
     "111111111111111111111111111111"
 ]
+
+building_data = {
+     ("1920s", 12, 6): {
+        "name": "Club",
+        "target_map": interior_1920s_club,
+        "spawn": (9, 11)
+    },
+
+    # --- 1960s ---
+    ("1960s", 10, 7): {
+        "name": "Cafe",
+        "target_map": interior_1920s_club,  # placeholder for now
+        "spawn": (5, 5)
+    },
+
+    # --- 1980s ---
+    ("1980s", 10, 4): {
+        "name": "Office",
+        "target_map": interior_1920s_bank,  # placeholder
+        "spawn": (5, 5)
+    },
+
+    # --- 1990s ---
+    ("1990s", 8, 12): {
+        "name": "Mall",
+        "target_map": interior_1920s_warehouse,  # placeholder
+        "spawn": (6, 6)
+    }
+}
 
 
 current_era = "Museum"
@@ -403,22 +433,20 @@ while running:
                             transition_to(museum_map, "Museum", 30, 15)
                     
                     elif tile == "2": 
-                        if current_era == "1920s":
-                            transition_to(interior_1920s_club, "1920s_Club", 9, 11) # Safe inside
-                        else:
-                            transition_to(era_1920s_map, "1920s", 5, 12) # Safe street spot
 
-                    elif tile == "7":
-                        if current_era == "1920s":
-                            transition_to(interior_1920s_bank, "1920s_Bank", 9, 11) # Safe inside
-                        else:
-                            transition_to(era_1920s_map, "1920s", 5, 5) # Safe street spot
+                        print("Checking:", current_era, col_index, row_index)
 
-                    elif tile == "9":
-                        if current_era == "1920s":
-                            transition_to(interior_1920s_warehouse, "1920s_Warehouse", 9, 11) # Safe inside
-                        else:
-                            transition_to(era_1920s_map, "1920s", 23, 12) # Safe street spot
+                        key = (current_era, col_index, row_index)
+
+                        if key in building_data:
+                            building = building_data[key]
+
+                            transition_to(
+                                building["target_map"],
+                                building["name"],
+                                building["spawn"][0],
+                                building["spawn"][1]
+                            )
                         
                     visited_map = [[False for _ in range(len(game_map[0]))] for _ in range(len(game_map))]
 
