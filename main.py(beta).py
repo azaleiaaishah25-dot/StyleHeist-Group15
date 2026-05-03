@@ -27,7 +27,7 @@ quest_log = {}
 # NPC DATA
 dialogue_data = {
     (13, 6): {
-        "dialogue": ["Hello Detective.", "Find the missing artifact."],
+        "dialogue": ["Well now, you look like you’ve walked straight out of a different world.", "That outfit.. I don’t think I’ve seen anything like it."],
         "quest": "find_artifact",
         "type": "main"
     },
