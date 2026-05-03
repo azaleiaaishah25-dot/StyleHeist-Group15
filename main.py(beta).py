@@ -290,13 +290,6 @@ building_data = {
 current_era = "Museum"
 game_map = museum_map #Starting at the Museum
 
-if current_era == "1920s" and "first_1920s" not in seen_self_dialogues:
-    start_dialogue([
-        "So this is the 1920s...",
-        "The whole place feels different from the museum."
-    ])
-    seen_self_dialogues.add("first_1920s")
-
 #Fog of war 
 visited_map = [[False for _ in range(len(museum_map[0]))] for _ in range(len(museum_map))]
 
