@@ -692,7 +692,7 @@ while running:
 
                 
 
-    pygame.display.update()
+        pygame.display.update()
 
 pygame.quit()
 
