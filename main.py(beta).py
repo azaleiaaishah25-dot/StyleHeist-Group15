@@ -11,13 +11,11 @@ pygame.display.set_caption("Style Heist - Detective Game")
 clock = pygame.time.Clock() #limit the pc fps 
 font = pygame.font.SysFont(None, 30)
 
-seen_self_dialogues = set()
 dialogue_active = False
 current_dialogue = []
 dialogue_index = 0
 dialogue_text_shown = ""
 text_speed = 2
-text_counter = 0
 
 can_interact = False
 current_npc = None
