@@ -392,7 +392,7 @@ player_size = tile_size
 player_size = 60
 player_x = 1500
 player_y = 1600
-speed = 10 #pixels per movements in a frame = FPS
+speed = 10 #pixels per movement per frame
 
 
 #4. Images
@@ -406,13 +406,23 @@ tree_img = pygame.transform.scale(tree_img, (tile_size, tile_size))
 
 def check_collision(x, y, current_map):
     player_rect = pygame.Rect(x, y, player_size, player_size)
-    for row_index, row in enumerate(current_map):
-        for col_index, tile in enumerate(row):
+
+    # Only check nearby tiles around the player instead of scanning the whole map.
+    left_tile = max(0, player_rect.left // tile_size)
+    right_tile = min(len(current_map[0]) - 1, player_rect.right // tile_size)
+    top_tile = max(0, player_rect.top // tile_size)
+    bottom_tile = min(len(current_map) - 1, player_rect.bottom // tile_size)
+
+    for row in range(top_tile, bottom_tile + 1):
+        for col in range(left_tile, right_tile + 1):
+            tile = current_map[row][col]
+
             if tile in ["1", "3", "5"]:
-                wall_rect = pygame.Rect(col_index * tile_size, row_index * tile_size, tile_size, tile_size)
+                wall_rect = pygame.Rect(col * tile_size, row * tile_size, tile_size, tile_size)
+
                 if player_rect.colliderect(wall_rect):
                     return True
-                
+
     return False
 
 def transition_to(new_map_array, new_era_name, spawn_tile_x, spawn_tile_y):
@@ -431,10 +441,10 @@ def transition_to(new_map_array, new_era_name, spawn_tile_x, spawn_tile_y):
 
 #6. Main Game Loop
 running = True
-while running: 
-    clock.tick(60) #fps, frame per second
+while running:
+    clock.tick(60) # fps
 
-    #A. Events
+    # A. Events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -454,14 +464,12 @@ while running:
                         dialogue_text_shown = ""
                         text_counter = 0
 
-                        # Add quest to log
                         if current_quest:
                             quest_log[current_quest] = "started"
 
             elif event.key == pygame.K_SPACE:
                 if dialogue_active and dialogue_index < len(current_dialogue):
                     current_line = current_dialogue[dialogue_index]
-                   
 
                     if isinstance(current_line, dict):
                         full_text = current_line["text"]
@@ -478,7 +486,7 @@ while running:
                         if dialogue_index >= len(current_dialogue):
                             dialogue_active = False
 
-    # B. Movement        
+    # B. Movement Logic
     new_x = player_x
     new_y = player_y
 
@@ -494,13 +502,15 @@ while running:
         if hotkeys[pygame.K_d]:
             new_x += speed
 
-        #Move X
+    # Move X
     if not check_collision(new_x, player_y, game_map):
         player_x = new_x
-        #Move Y
+
+    # Move Y
     if not check_collision(player_x, new_y, game_map):
         player_y = new_y
-    
+
+    # Camera
     camera_x = player_x - (WIDTH // 2)
     camera_y = player_y - (HEIGHT // 2)
 
@@ -526,62 +536,47 @@ while running:
 
     # Fog of war
     reveal_radius = 3
-
     for fog_row in range(player_row - reveal_radius, player_row + reveal_radius + 1):
         for fog_col in range(player_col - reveal_radius, player_col + reveal_radius + 1):
             if 0 <= fog_row < len(game_map) and 0 <= fog_col < len(game_map[0]):
                 visited_map[fog_row][fog_col] = True
 
-            #C. Teleportation Logic & Door logic
-    player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
+    # C. Teleportation Logic & Door Logic
+    player_center_x = player_x + player_size // 2
+    player_center_y = player_y + player_size // 2
 
-    for row_index, row in enumerate(game_map):
-        for col_index, tile in enumerate(row):
-                    
-            if tile in ["4", "2", "7", "8", "9"]: 
-                trigger_rect = pygame.Rect(col_index * tile_size, row_index * tile_size, tile_size, tile_size)
+    tile_col = player_center_x // tile_size
+    tile_row = player_center_y // tile_size
 
-                    
-                if player_rect.colliderect(trigger_rect):
+    if 0 <= tile_row < len(game_map) and 0 <= tile_col < len(game_map[0]):
+        current_tile = game_map[tile_row][tile_col]
 
-                    if tile == "4": 
-                        if current_era == "Museum":
-                            transition_to(era_1920s_map, "1920s", 14, 10)
+        if current_tile == "4":
+            if current_era == "Museum":
+                transition_to(era_1920s_map, "1920s", 14, 10)
+            elif current_era == "1920s":
+                transition_to(era_1960s_map, "1960s", 14, 10)
+            elif current_era == "1960s":
+                transition_to(era_1980s_map, "1980s", 14, 10)
+            elif current_era == "1980s":
+                transition_to(era_1990s_map, "1990s", 14, 10)
+            else:
+                transition_to(museum_map, "Museum", 30, 15)
 
-                        elif current_era == "1920s":
-                            transition_to(era_1960s_map, "1960s", 14, 10)
+        elif current_tile == "2":
+            key = (current_era, tile_col, tile_row)
 
-                        elif current_era == "1960s":
-                            transition_to(era_1980s_map, "1980s", 14, 10)
+            if key in building_data:
+                building = building_data[key]
 
-                        elif current_era == "1980s":
-                            transition_to(era_1990s_map, "1990s", 14, 10)
+                transition_to(
+                    building["target_map"],
+                    building["name"],
+                    building["spawn"][0],
+                    building["spawn"][1]
+                )
 
-                        else:
-                            transition_to(museum_map, "Museum", 30, 15)
-                            
-                    elif tile == "2": 
-
-                        print("Checking:", current_era, col_index, row_index)
-
-                        key = (current_era, col_index, row_index)
-
-                        if key in building_data:
-                            building = building_data[key]
-
-                            transition_to(
-                                building["target_map"],
-                                building["name"],
-                                building["spawn"][0],
-                                building["spawn"][1]
-                                )
-                                
-                    visited_map = [[False for _ in range(len(game_map[0]))] for _ in range(len(game_map))]
-
-                    pygame.time.delay(200)
-                    break
-                                            
-            # Typewriter effect
+    # Typewriter effect
     if dialogue_active:
         if dialogue_index < len(current_dialogue):
             current_line = current_dialogue[dialogue_index]
@@ -595,18 +590,17 @@ while running:
                 text_counter += text_speed
                 dialogue_text_shown = full_text[:text_counter]
 
-            #D. Drawing
+    # D. Drawing
     screen.fill((10, 20, 20))
 
     for row_index, row in enumerate(game_map):
         for col_index, tile in enumerate(row):
-                    
             world_x = col_index * tile_size
             world_y = row_index * tile_size
 
             screen_x = world_x - camera_x
             screen_y = world_y - camera_y
-                    
+
             if -tile_size < screen_x < WIDTH and -tile_size < screen_y < HEIGHT:
                 if tile == "1":
                     pygame.draw.rect(screen, (90, 90, 90), (screen_x, screen_y, tile_size, tile_size))
@@ -615,52 +609,52 @@ while running:
                 elif tile == "3":
                     screen.blit(tree_img, (screen_x, screen_y))
                 elif tile == "4":
-                    pygame.draw.rect(screen, (200, 150, 50), (screen_x, screen_y, tile_size, tile_size)) # Portal
+                    pygame.draw.rect(screen, (200, 150, 50), (screen_x, screen_y, tile_size, tile_size))
                 elif tile == "5":
-                    pygame.draw.rect(screen, (0, 0, 255), (screen_x, screen_y, tile_size, tile_size)) # NPC Placeholder
+                    pygame.draw.rect(screen, (0, 0, 255), (screen_x, screen_y, tile_size, tile_size))
                 elif tile == "6":
                     pygame.draw.rect(screen, (255, 20, 147), (screen_x, screen_y, tile_size, tile_size))
                 elif tile == "9":
                     pygame.draw.rect(screen, (101, 67, 33), (screen_x, screen_y, tile_size, tile_size))
                 else:
                     pygame.draw.rect(screen, (200, 200, 200), (screen_x, screen_y, tile_size, tile_size))
-                    
-                    # Grid lines
+
+                # Grid lines
                 pygame.draw.rect(screen, (0, 0, 0), (screen_x, screen_y, tile_size, tile_size), 1)
-        
-            # Draw Player
+
+    # Draw Player
     screen.blit(duck_img, (player_x - camera_x, player_y - camera_y))
 
-            # ---Mini-Map---
+    # Mini-map
     mini_tile = 5
     map_width = len(game_map[0]) * mini_tile
     start_x = WIDTH - map_width - 20
     start_y = 20
 
-            #1. Mini Map
-    pygame.draw.rect(screen, (30, 30, 30), (start_x - 2, start_y -2, map_width + 4, len(game_map) * mini_tile + 4))
+    pygame.draw.rect(screen, (30, 30, 30), (start_x - 2, start_y - 2, map_width + 4, len(game_map) * mini_tile + 4))
 
-            #2. Draw Tiles
     for row_index, row in enumerate(game_map):
         for col_index, tile in enumerate(row):
             if visited_map[row_index][col_index]:
                 mini_x = start_x + (col_index * mini_tile)
                 mini_y = start_y + (row_index * mini_tile)
 
-                if tile == "1": #wall
+                if tile == "1":
                     pygame.draw.rect(screen, (150, 150, 150), (mini_x, mini_y, mini_tile, mini_tile))
-                elif tile == "4": #Portal
+                elif tile == "4":
                     pygame.draw.rect(screen, (200, 150, 50), (mini_x, mini_y, mini_tile, mini_tile))
                 else:
                     pygame.draw.rect(screen, (70, 70, 70), (mini_x, mini_y, mini_tile, mini_tile))
 
-
     player_mini_x = start_x + (player_x // tile_size) * mini_tile
     player_mini_y = start_y + (player_y // tile_size) * mini_tile
-    pygame.draw.circle(screen, (0, 255, 0 ), (player_mini_x + mini_tile//2, player_mini_y + mini_tile//2), 3)
+    pygame.draw.circle(screen, (0, 255, 0), (player_mini_x + mini_tile // 2, player_mini_y + mini_tile // 2), 3)
 
-    era_label = font.render(f"TIMELINE: {current_era}", True, (255, 255, 0)) #Yellow Color
+    era_label = font.render(f"TIMELINE: {current_era}", True, (255, 255, 0))
     screen.blit(era_label, (20, 20))
+
+    fps_label = font.render(f"FPS: {int(clock.get_fps())}", True, (255, 255, 255))
+    screen.blit(fps_label, (20, 50))
 
     if can_interact and not dialogue_active:
         hint = font.render("Press E", True, (255, 255, 255))
@@ -687,15 +681,12 @@ while running:
             screen.blit(speaker_text, (box_rect.x + 20, box_rect.y + 20))
             screen.blit(rendered_text, (box_rect.x + 20, box_rect.y + 55))
 
-            hint = font.render("SPACE to continue", True, (200, 200, 200))
-            screen.blit(hint, (box_rect.x + 20, box_rect.y + 105))
+        hint = font.render("SPACE to continue", True, (200, 200, 200))
+        screen.blit(hint, (box_rect.x + 20, box_rect.y + 105))
 
-                
-
-        pygame.display.update()
+    pygame.display.update()
 
 pygame.quit()
-
 #4/19/2026 and Earlier dates
 #Summary on what I have done in my part for the games:
 #Refactored the Architecture, Resolution Upgrade
