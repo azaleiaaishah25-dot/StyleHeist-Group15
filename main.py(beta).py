@@ -84,7 +84,7 @@ dialogue_data = {
     # =========================
     # 1920s NPC 2: Old Tailor
     # =========================
-    ("1920s", 13, 11): {
+    ("1920s", 19, 11): {
         "speaker": "Old Tailor",
         "dialogue": [
             {"speaker": "OLD TAILOR", "text": "..Hmm."},
@@ -392,7 +392,7 @@ player_size = tile_size
 player_size = 60
 player_x = 1500
 player_y = 1600
-speed = 12 #pixels per movements in a frame = FPS
+speed = 10 #pixels per movements in a frame = FPS
 
 
 #4. Images
@@ -427,7 +427,7 @@ def transition_to(new_map_array, new_era_name, spawn_tile_x, spawn_tile_y):
     
     visited_map = [[False for _ in range(len(game_map[0]))] for _ in range(len(game_map))]
     
-    pygame.time.delay(250)
+    pygame.time.delay(80)
 
 #6. Main Game Loop
 running = True
@@ -459,8 +459,9 @@ while running:
                             quest_log[current_quest] = "started"
 
             elif event.key == pygame.K_SPACE:
-                if dialogue_active:
+                if dialogue_active and dialogue_index < len(current_dialogue):
                     current_line = current_dialogue[dialogue_index]
+                   
 
                     if isinstance(current_line, dict):
                         full_text = current_line["text"]
@@ -476,9 +477,10 @@ while running:
 
                         if dialogue_index >= len(current_dialogue):
                             dialogue_active = False
-                    
-        new_x = player_x
-        new_y = player_y
+
+    # B. Movement        
+    new_x = player_x
+    new_y = player_y
 
     if not dialogue_active:
         hotkeys = pygame.key.get_pressed()
@@ -492,10 +494,10 @@ while running:
         if hotkeys[pygame.K_d]:
             new_x += speed
 
-    #Move X
+        #Move X
     if not check_collision(new_x, player_y, game_map):
         player_x = new_x
-    #Move Y
+        #Move Y
     if not check_collision(player_x, new_y, game_map):
         player_y = new_y
     
@@ -531,172 +533,166 @@ while running:
                 visited_map[fog_row][fog_col] = True
 
             #C. Teleportation Logic & Door logic
-            player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
+    player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
 
-            for row_index, row in enumerate(game_map):
-                for col_index, tile in enumerate(row):
+    for row_index, row in enumerate(game_map):
+        for col_index, tile in enumerate(row):
                     
-                 if tile in ["4", "2", "7", "8", "9"]: 
-                    trigger_rect = pygame.Rect(col_index * tile_size, row_index * tile_size, tile_size, tile_size)
+            if tile in ["4", "2", "7", "8", "9"]: 
+                trigger_rect = pygame.Rect(col_index * tile_size, row_index * tile_size, tile_size, tile_size)
 
                     
-                    if player_rect.colliderect(trigger_rect):
+                if player_rect.colliderect(trigger_rect):
 
-                        if tile == "4": 
-                            if current_era == "Museum":
-                                transition_to(era_1920s_map, "1920s", 14, 10)
+                    if tile == "4": 
+                        if current_era == "Museum":
+                            transition_to(era_1920s_map, "1920s", 14, 10)
 
-                            elif current_era == "1920s":
-                                transition_to(era_1960s_map, "1960s", 14, 10)
+                        elif current_era == "1920s":
+                            transition_to(era_1960s_map, "1960s", 14, 10)
 
-                            elif current_era == "1960s":
-                                transition_to(era_1980s_map, "1980s", 14, 10)
+                        elif current_era == "1960s":
+                            transition_to(era_1980s_map, "1980s", 14, 10)
 
-                            elif current_era == "1980s":
-                                transition_to(era_1990s_map, "1990s", 14, 10)
+                        elif current_era == "1980s":
+                            transition_to(era_1990s_map, "1990s", 14, 10)
 
-                            else:
-                                transition_to(museum_map, "Museum", 30, 15)
+                        else:
+                            transition_to(museum_map, "Museum", 30, 15)
                             
-                        elif tile == "2": 
+                    elif tile == "2": 
 
-                            print("Checking:", current_era, col_index, row_index)
+                        print("Checking:", current_era, col_index, row_index)
 
-                            key = (current_era, col_index, row_index)
+                        key = (current_era, col_index, row_index)
 
-                            if key in building_data:
-                                building = building_data[key]
+                        if key in building_data:
+                            building = building_data[key]
 
-                                transition_to(
-                                    building["target_map"],
-                                    building["name"],
-                                    building["spawn"][0],
-                                    building["spawn"][1]
-                                    )
+                            transition_to(
+                                building["target_map"],
+                                building["name"],
+                                building["spawn"][0],
+                                building["spawn"][1]
+                                )
                                 
-                        visited_map = [[False for _ in range(len(game_map[0]))] for _ in range(len(game_map))]
+                    visited_map = [[False for _ in range(len(game_map[0]))] for _ in range(len(game_map))]
 
-                        pygame.time.delay(200)
-                        break
-
-                        if dialogue_active:
-                            if dialogue_index < len(current_dialogue):
-                                full_text = current_dialogue[dialogue_index]
-
-                                if text_counter < len(full_text):
-                                    text_counter += text_speed
-                                    dialogue_text_shown = full_text[:text_counter]
+                    pygame.time.delay(200)
+                    break
                                             
             # Typewriter effect
-            if dialogue_active:
-                if dialogue_index < len(current_dialogue):
-                    current_line = current_dialogue[dialogue_index]
+    if dialogue_active:
+        if dialogue_index < len(current_dialogue):
+            current_line = current_dialogue[dialogue_index]
 
-                    if isinstance(current_line, dict):
-                        full_text = current_line["text"]
-                    else:
-                        full_text = current_line
+            if isinstance(current_line, dict):
+                full_text = current_line["text"]
+            else:
+                full_text = current_line
 
-                    if text_counter < len(full_text):
-                        text_counter += text_speed
-                        dialogue_text_shown = full_text[:text_counter]
+            if text_counter < len(full_text):
+                text_counter += text_speed
+                dialogue_text_shown = full_text[:text_counter]
 
             #D. Drawing
-            screen.fill((10, 20, 20))
+    screen.fill((10, 20, 20))
 
-            for row_index, row in enumerate(game_map):
-                for col_index, tile in enumerate(row):
+    for row_index, row in enumerate(game_map):
+        for col_index, tile in enumerate(row):
                     
-                    world_x = col_index * tile_size
-                    world_y = row_index * tile_size
+            world_x = col_index * tile_size
+            world_y = row_index * tile_size
 
-                    screen_x = world_x - camera_x
-                    screen_y = world_y - camera_y
+            screen_x = world_x - camera_x
+            screen_y = world_y - camera_y
                     
-                    if -tile_size < screen_x < WIDTH and -tile_size < screen_y < HEIGHT:
-                        if tile == "1":
-                            pygame.draw.rect(screen, (90, 90, 90), (screen_x, screen_y, tile_size, tile_size))
-                        elif tile == "2":
-                            pygame.draw.rect(screen, (101, 67, 33), (screen_x, screen_y, tile_size, tile_size))
-                        elif tile == "3":
-                            screen.blit(tree_img, (screen_x, screen_y))
-                        elif tile == "4":
-                            pygame.draw.rect(screen, (200, 150, 50), (screen_x, screen_y, tile_size, tile_size)) # Portal
-                        elif tile == "5":
-                            pygame.draw.rect(screen, (0, 0, 255), (screen_x, screen_y, tile_size, tile_size)) # NPC Placeholder
-                        elif tile == "6":
-                            pygame.draw.rect(screen, (255, 20, 147), (screen_x, screen_y, tile_size, tile_size))
-                        elif tile == "9":
-                            pygame.draw.rect(screen, (101, 67, 33), (screen_x, screen_y, tile_size, tile_size))
-                        else:
-                            pygame.draw.rect(screen, (200, 200, 200), (screen_x, screen_y, tile_size, tile_size))
+            if -tile_size < screen_x < WIDTH and -tile_size < screen_y < HEIGHT:
+                if tile == "1":
+                    pygame.draw.rect(screen, (90, 90, 90), (screen_x, screen_y, tile_size, tile_size))
+                elif tile == "2":
+                    pygame.draw.rect(screen, (101, 67, 33), (screen_x, screen_y, tile_size, tile_size))
+                elif tile == "3":
+                    screen.blit(tree_img, (screen_x, screen_y))
+                elif tile == "4":
+                    pygame.draw.rect(screen, (200, 150, 50), (screen_x, screen_y, tile_size, tile_size)) # Portal
+                elif tile == "5":
+                    pygame.draw.rect(screen, (0, 0, 255), (screen_x, screen_y, tile_size, tile_size)) # NPC Placeholder
+                elif tile == "6":
+                    pygame.draw.rect(screen, (255, 20, 147), (screen_x, screen_y, tile_size, tile_size))
+                elif tile == "9":
+                    pygame.draw.rect(screen, (101, 67, 33), (screen_x, screen_y, tile_size, tile_size))
+                else:
+                    pygame.draw.rect(screen, (200, 200, 200), (screen_x, screen_y, tile_size, tile_size))
                     
                     # Grid lines
-                    pygame.draw.rect(screen, (0, 0, 0), (screen_x, screen_y, tile_size, tile_size), 1)
-
+                pygame.draw.rect(screen, (0, 0, 0), (screen_x, screen_y, tile_size, tile_size), 1)
+        
             # Draw Player
-            screen.blit(duck_img, (player_x - camera_x, player_y - camera_y))
+    screen.blit(duck_img, (player_x - camera_x, player_y - camera_y))
 
             # ---Mini-Map---
-            mini_tile = 5
-            map_width = len(game_map[0]) * mini_tile
-            start_x = WIDTH - map_width - 20
-            start_y = 20
+    mini_tile = 5
+    map_width = len(game_map[0]) * mini_tile
+    start_x = WIDTH - map_width - 20
+    start_y = 20
 
             #1. Mini Map
-            pygame.draw.rect(screen, (30, 30, 30), (start_x - 2, start_y -2, map_width + 4, len(game_map) * mini_tile + 4))
+    pygame.draw.rect(screen, (30, 30, 30), (start_x - 2, start_y -2, map_width + 4, len(game_map) * mini_tile + 4))
 
             #2. Draw Tiles
-            for row_index, row in enumerate(game_map):
-                for col_index, tile in enumerate(row):
-                    if visited_map[row_index][col_index]:
-                        mini_x = start_x + (col_index * mini_tile)
-                        mini_y = start_y + (row_index * mini_tile)
+    for row_index, row in enumerate(game_map):
+        for col_index, tile in enumerate(row):
+            if visited_map[row_index][col_index]:
+                mini_x = start_x + (col_index * mini_tile)
+                mini_y = start_y + (row_index * mini_tile)
 
-                        if tile == "1": #wall
-                            pygame.draw.rect(screen, (150, 150, 150), (mini_x, mini_y, mini_tile, mini_tile))
-                        elif tile == "4": #Portal
-                            pygame.draw.rect(screen, (200, 150, 50), (mini_x, mini_y, mini_tile, mini_tile))
-                        else:
-                            pygame.draw.rect(screen, (70, 70, 70), (mini_x, mini_y, mini_tile, mini_tile))
+                if tile == "1": #wall
+                    pygame.draw.rect(screen, (150, 150, 150), (mini_x, mini_y, mini_tile, mini_tile))
+                elif tile == "4": #Portal
+                    pygame.draw.rect(screen, (200, 150, 50), (mini_x, mini_y, mini_tile, mini_tile))
+                else:
+                    pygame.draw.rect(screen, (70, 70, 70), (mini_x, mini_y, mini_tile, mini_tile))
 
 
-            player_mini_x = start_x + (player_x // tile_size) * mini_tile
-            player_mini_y = start_y + (player_y // tile_size) * mini_tile
-            pygame.draw.circle(screen, (0, 255, 0 ), (player_mini_x + mini_tile//2, player_mini_y + mini_tile//2), 3)
+    player_mini_x = start_x + (player_x // tile_size) * mini_tile
+    player_mini_y = start_y + (player_y // tile_size) * mini_tile
+    pygame.draw.circle(screen, (0, 255, 0 ), (player_mini_x + mini_tile//2, player_mini_y + mini_tile//2), 3)
 
-            era_label = font.render(f"TIMELINE: {current_era}", True, (255, 255, 0)) #Yellow Color
-            screen.blit(era_label, (20, 20))
+    era_label = font.render(f"TIMELINE: {current_era}", True, (255, 255, 0)) #Yellow Color
+    screen.blit(era_label, (20, 20))
 
-            if can_interact and not dialogue_active:
-                hint = font.render("Press E", True, (255, 255, 255))
-                screen.blit(hint, (player_x - camera_x, player_y - camera_y - 30))
+    if can_interact and not dialogue_active:
+        hint = font.render("Press E", True, (255, 255, 255))
+        screen.blit(hint, (player_x - camera_x, player_y - camera_y - 30))
 
-            if dialogue_active:
-                box_height = 150
-                box_rect = pygame.Rect(50, HEIGHT - box_height - 30, WIDTH - 100, box_height)
+    if dialogue_active:
+        box_height = 150
+        box_rect = pygame.Rect(50, HEIGHT - box_height - 30, WIDTH - 100, box_height)
 
-                pygame.draw.rect(screen, (0, 0, 0), box_rect)
-                pygame.draw.rect(screen, (255, 255, 255), box_rect, 3)
+        pygame.draw.rect(screen, (0, 0, 0), box_rect)
+        pygame.draw.rect(screen, (255, 255, 255), box_rect, 3)
 
-                if dialogue_index < len(current_dialogue):
-                    current_line = current_dialogue[dialogue_index]
+        if dialogue_index < len(current_dialogue):
+            current_line = current_dialogue[dialogue_index]
 
-                    if isinstance(current_line, dict):
-                        speaker = current_line.get("speaker", "")
-                    else:
-                        speaker = ""
+            if isinstance(current_line, dict):
+                speaker = current_line.get("speaker", "")
+            else:
+                speaker = ""
 
-                    speaker_text = font.render(speaker, True, (255, 255, 0))
-                    rendered_text = font.render(dialogue_text_shown, True, (255, 255, 255))
+            speaker_text = font.render(speaker, True, (255, 255, 0))
+            rendered_text = font.render(dialogue_text_shown, True, (255, 255, 255))
 
-                    screen.blit(speaker_text, (box_rect.x + 20, box_rect.y + 20))
-                    screen.blit(rendered_text, (box_rect.x + 20, box_rect.y + 55))
+            screen.blit(speaker_text, (box_rect.x + 20, box_rect.y + 20))
+            screen.blit(rendered_text, (box_rect.x + 20, box_rect.y + 55))
 
-                hint = font.render("SPACE to continue", True, (200, 200, 200))
-                screen.blit(hint, (box_rect.x + 20, box_rect.y + 105))
+            hint = font.render("SPACE to continue", True, (200, 200, 200))
+            screen.blit(hint, (box_rect.x + 20, box_rect.y + 105))
 
-            pygame.display.update()
+                
+
+    pygame.display.update()
 
 pygame.quit()
 
