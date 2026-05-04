@@ -11,6 +11,21 @@ pygame.display.set_caption("Style Heist - Detective Game")
 clock = pygame.time.Clock() #limit the pc fps 
 font = pygame.font.SysFont(None, 30)
 
+#Game state
+game_state = "Menu"
+
+#Menu Fonts
+title_font = pygame.font.SysFont(None, 90)
+menu_font = pygame.font.SysFont(None, 45)
+small_font = pygame.font.SysFont(None, 28)
+
+#Menu Buttons
+start_button = pygame.Rect(WIDTH // 2 - 150, 350, 300, 60)
+credits_button = pygame.Rect(WIDTH // 2 - 150, 430, 300, 60)
+quit_button = pygame.Rect(WIDTH // 2 - 150, 510, 300, 60)
+back_button = pygame.Rect(WIDTH // 2 - 100, 620, 200, 50)
+
+
 seen_self_dialogues = set()
 dialogue_active = False
 current_dialogue = []
@@ -449,42 +464,70 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
 
-            if event.key == pygame.K_e:
-                if not dialogue_active and can_interact:
-                    if current_npc in dialogue_data:
-                        npc_data = dialogue_data[current_npc]
+                if game_state == "menu":
+                    if start_button.collidepoint(event.pos):
+                        game_state = "playing"
 
-                        current_dialogue = npc_data["dialogue"]
-                        current_quest = npc_data.get("quest")
+                    elif credits_button.collidepoint(event.pos):
+                        game_state = "credits"
 
-                        dialogue_active = True
-                        dialogue_index = 0
-                        dialogue_text_shown = ""
-                        text_counter = 0
+                    elif quit_button.collidepoint(event.pos):
+                        running = False
 
-                        if current_quest:
-                            quest_log[current_quest] = "started"
+                elif game_state == "credits":
+                    if back_button.collidepoint(event.pos):
+                        game_state = "menu"
 
-            elif event.key == pygame.K_SPACE:
-                if dialogue_active and dialogue_index < len(current_dialogue):
-                    current_line = current_dialogue[dialogue_index]
+        if game_state == "playing":
+            if event.type == pygame.KEYDOWN:
 
-                    if isinstance(current_line, dict):
-                        full_text = current_line["text"]
-                    else:
-                        full_text = current_line
+                if event.key == pygame.K_e:
+                    if not dialogue_active and can_interact:
+                        if current_npc in dialogue_data:
+                            npc_data = dialogue_data[current_npc]
 
-                    if dialogue_text_shown != full_text:
-                        dialogue_text_shown = full_text
-                    else:
-                        dialogue_index += 1
-                        text_counter = 0
-                        dialogue_text_shown = ""
+                            current_dialogue = npc_data["dialogue"]
+                            current_quest = npc_data.get("quest")
 
-                        if dialogue_index >= len(current_dialogue):
-                            dialogue_active = False
+                            dialogue_active = True
+                            dialogue_index = 0
+                            dialogue_text_shown = ""
+                            text_counter = 0
+
+                            if current_quest:
+                                quest_log[current_quest] = "started"
+
+                elif event.key == pygame.K_SPACE:
+                    if dialogue_active and dialogue_index < len(current_dialogue):
+                        current_line = current_dialogue[dialogue_index]
+
+                        if isinstance(current_line, dict):
+                            full_text = current_line["text"]
+                        else:
+                            full_text = current_line
+
+                        if dialogue_text_shown != full_text:
+                            dialogue_text_shown = full_text
+                        else:
+                            dialogue_index += 1
+                            text_counter = 0
+                            dialogue_text_shown = ""
+
+                            if dialogue_index >= len(current_dialogue):
+                                dialogue_active = False
+
+    if game_state == "menu":
+        draw_main_menu()
+        pygame.display.update()
+        continue
+    elif game_state == "credits":
+        draw_credits_screen()
+        pygame.display.update
+        continue
+
 
     # B. Movement Logic
     new_x = player_x
@@ -649,6 +692,70 @@ while running:
     player_mini_x = start_x + (player_x // tile_size) * mini_tile
     player_mini_y = start_y + (player_y // tile_size) * mini_tile
     pygame.draw.circle(screen, (0, 255, 0), (player_mini_x + mini_tile // 2, player_mini_y + mini_tile // 2), 3)
+
+    def draw_button(rect, text):
+        mouse_pos = pygame.mouse.get_pos()
+
+        if rect.collidepoint(mouse_pos):
+            color = (180, 140, 70)
+        else:
+            color = (120, 90, 50)
+
+        pygame.draw.rect(screen, color, rect)
+        pygame.draw.rect(screen, (255, 255, 255), rect, 3)
+
+        text_surface = menu_font.render(text, True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center = rect.center)
+        screen.blit(text_surface, text_rect)
+
+    def draw_main_menu():
+        screen.fill((15, 10, 20))
+
+        title_text = title_font.render("STYLE HEIST", True, (255, 220, 120))
+        title_rect = title_text.get_rect(center=(WIDTH // 2, 180))
+        screen.blit(title_text, title_rect)
+
+        subtitle_text = small_font.render("A Detective Time-Travel Fashion Mystery", True, (220, 220, 220))
+        subtitle_rect = subtitle_text.get_rect(center=(WIDTH // 2, 245))
+        screen.blit(subtitle_text, subtitle_rect)
+
+        draw_button(start_button, "Start Game")
+        draw_button(credits_button, "Credits")
+        draw_button(quit_button, "Quit")
+
+        footer_text = small_font.render("UI Design Placeholder - Balqish can redesign this screen", True, (160, 160, 160))
+        footer_rect = footer_text.get_rect(center=(WIDTH // 2, HEIGHT - 40))
+        screen.blit(footer_text, footer_rect)
+
+
+    def draw_credits_screen():
+        screen.fill((10, 15, 25))
+
+        title_text = title_font.render("CREDITS", True, (255, 220, 120))
+        title_rect = title_text.get_rect(center=(WIDTH // 2, 140))
+        screen.blit(title_text, title_rect)
+
+        credits = [
+        "Style Heist - Group 15",
+        "",
+        "Programming / Game Systems: Alvin",
+        "UI Design Contributor: Balqish",
+        "Dialogue / Story Contributor: Your teammate",
+        "",
+        "Built using Python and Pygame"
+    ]
+
+    y = 230
+    for line in credits:
+        text_surface = menu_font.render(line, True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(WIDTH // 2, y))
+        screen.blit(text_surface, text_rect)
+        y += 45
+
+    draw_button(back_button, "Back")
+
+
+
 
     era_label = font.render(f"TIMELINE: {current_era}", True, (255, 255, 0))
     screen.blit(era_label, (20, 20))
