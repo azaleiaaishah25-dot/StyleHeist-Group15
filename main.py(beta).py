@@ -134,8 +134,6 @@ item_dialogue_data = {
 }
 
 #2. The Maps (Scene to Scene)
-# --- 2. THE MAPS (MUSEUM - RE-RE-REDESIGN) ---
-# I have cleared a massive 10x10 square around Column 30, Row 15.
 museum_map = [
     "111111111111111111111111111111111111111111111111111111111111", # 00
     "100000000000000111111111111111111111111111100000000000000001", 
@@ -327,51 +325,44 @@ era_1990s_map = [
 ]
 
 building_data = {
-    # 1920s: CLub entrance (left-top building)
-     ("1920s", 4, 4): {"name": "Club", "target_map": interior_1920s_club, "spawn": (9, 11)},
+    
+    ("1920s", 4, 4): {"name": "Club", "target_map": interior_1920s_club, "spawn": (9, 11)},
     ("1920s", 5, 4): {"name": "Club", "target_map": interior_1920s_club, "spawn": (9, 11)},
     ("1920s", 6, 4): {"name": "Club", "target_map": interior_1920s_club, "spawn": (9, 11)},
     ("1920s", 7, 4): {"name": "Club", "target_map": interior_1920s_club, "spawn": (9, 11)},
 
-    # --- 1920s: Bank entrance (right-top building) ---
     ("1920s", 21, 4): {"name": "Bank", "target_map": interior_1920s_bank, "spawn": (9, 11)},
     ("1920s", 22, 4): {"name": "Bank", "target_map": interior_1920s_bank, "spawn": (9, 11)},
     ("1920s", 23, 4): {"name": "Bank", "target_map": interior_1920s_bank, "spawn": (9, 11)},
     ("1920s", 24, 4): {"name": "Bank", "target_map": interior_1920s_bank, "spawn": (9, 11)},
 
-    # --- 1920s: Warehouse entrance (right-bottom building) ---
     ("1920s", 21, 13): {"name": "Warehouse", "target_map": interior_1920s_warehouse, "spawn": (9, 11)},
     ("1920s", 22, 13): {"name": "Warehouse", "target_map": interior_1920s_warehouse, "spawn": (9, 11)},
     ("1920s", 23, 13): {"name": "Warehouse", "target_map": interior_1920s_warehouse, "spawn": (9, 11)},
     ("1920s", 24, 13): {"name": "Warehouse", "target_map": interior_1920s_warehouse, "spawn": (9, 11)},
 
-    # --- 1960s: Cafe entrance ---
+    
     ("1960s", 10, 7): {"name": "Cafe", "target_map": interior_1920s_club, "spawn": (9, 11)},  # placeholder interior
 
-    # --- 1980s: Office entrance ---
     ("1980s", 10, 4): {"name": "Office", "target_map": interior_1920s_bank, "spawn": (9, 11)},  # placeholder interior
-
-    # --- 1990s: Mall entrance ---
+    
     ("1990s", 8, 12): {"name": "Mall", "target_map": interior_1920s_warehouse, "spawn": (9, 11)},  # placeholder interior
 
-    # =========================================================
     # INTERIOR EXITS
-    # These match the "2" tiles inside your interior maps.
-    # =========================================================
 
-    # Club / Cafe use the same placeholder interior_1920s_club.
+    # Club / Cafe 
     ("Club", 8, 13): {"name": "1920s", "target_map": era_1920s_map, "spawn": (5, 5)},
     ("Club", 9, 13): {"name": "1920s", "target_map": era_1920s_map, "spawn": (5, 5)},
     ("Cafe", 8, 13): {"name": "1960s", "target_map": era_1960s_map, "spawn": (10, 8)},
     ("Cafe", 9, 13): {"name": "1960s", "target_map": era_1960s_map, "spawn": (10, 8)},
 
-    # Bank / Office use the same placeholder interior_1920s_bank.
+    # Bank / Office
     ("Bank", 8, 12): {"name": "1920s", "target_map": era_1920s_map, "spawn": (22, 5)},
     ("Bank", 9, 12): {"name": "1920s", "target_map": era_1920s_map, "spawn": (22, 5)},
     ("Office", 8, 12): {"name": "1980s", "target_map": era_1980s_map, "spawn": (10, 5)},
     ("Office", 9, 12): {"name": "1980s", "target_map": era_1980s_map, "spawn": (10, 5)},
 
-    # Warehouse / Mall use the same placeholder interior_1920s_warehouse.
+    # Warehouse / Mall 
     ("Warehouse", 8, 13): {"name": "1920s", "target_map": era_1920s_map, "spawn": (22, 12)},
     ("Warehouse", 9, 13): {"name": "1920s", "target_map": era_1920s_map, "spawn": (22, 12)},
     ("Mall", 8, 13): {"name": "1990s", "target_map": era_1990s_map, "spawn": (8, 13)},
