@@ -129,7 +129,7 @@ item_dialogue_data = {
             {"speaker": "DEVICE", "text": "Mini-game required to calibrate timeline."},
             {"speaker": "PLAYER", "text": "..Of course there's a catch."},
             {"speaker": "PLAYER", "text": "Nothing can ever be simple."},
-            {"speaker": "GAME", "text": "Mini-game starts here."}
+            {"speaker": "GAME", "text": "Mini-game starts somewhere here"}
         ],
         "quest": "boots_recovered"
     }
