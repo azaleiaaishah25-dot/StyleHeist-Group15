@@ -515,28 +515,28 @@ while running:
     can_interact = False
     current_npc = None
 
-    for row in range(player_row - 1, player_row + 2):
-        for col in range(player_col - 1, player_col + 2):
-            if 0 <= row < len(game_map) and 0 <= col < len(game_map[0]):
-                if game_map[row][col] == "5":
+    for npc_row in range(player_row - 1, player_row + 2):
+        for npc_col in range(player_col - 1, player_col + 2):
+            if 0 <= npc_row < len(game_map) and 0 <= npc_col < len(game_map[0]):
+                if game_map[npc_row][npc_col] == "5":
                     can_interact = True
-                    current_npc = (current_era, col, row)
+                    current_npc = (current_era, npc_col, npc_row)
 
-        #What Player can see
-        reveal_radius = 3
-        for row in range(player_row - reveal_radius, player_row + reveal_radius + 1):
-                for col in range(player_col - reveal_radius, player_col + reveal_radius + 1):
-                    if 0 <= row < len(game_map) and 0 <= col < len(game_map[0]):
-                        visited_map[row][col] = True
+    # Fog of war
+    reveal_radius = 3
 
+    for fog_row in range(player_row - reveal_radius, player_row + reveal_radius + 1):
+        for fog_col in range(player_col - reveal_radius, player_col + reveal_radius + 1):
+            if 0 <= fog_row < len(game_map) and 0 <= fog_col < len(game_map[0]):
+                visited_map[fog_row][fog_col] = True
 
-        #C. Teleportation Logic & Door logic
-        player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
+            #C. Teleportation Logic & Door logic
+            player_rect = pygame.Rect(player_x, player_y, player_size, player_size)
 
-        for row_index, row in enumerate(game_map):
-            for col_index, tile in enumerate(row):
+            for row_index, row in enumerate(game_map):
+                for col_index, tile in enumerate(row):
                     
-                if tile in ["4", "2", "7", "8", "9"]: 
+                 if tile in ["4", "2", "7", "8", "9"]: 
                     trigger_rect = pygame.Rect(col_index * tile_size, row_index * tile_size, tile_size, tile_size)
 
                     
