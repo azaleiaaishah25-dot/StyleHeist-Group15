@@ -25,6 +25,10 @@ credits_button = pygame.Rect(WIDTH // 2 - 150, 430, 300, 60)
 quit_button = pygame.Rect(WIDTH // 2 - 150, 510, 300, 60)
 back_button = pygame.Rect(WIDTH // 2 - 100, 620, 200, 50)
 
+game_exit_button = pygame.Rect(WIDTH - 130, 20, 100, 45)
+resume_button = pygame.Rect(WIDTH // 2 - 150, 330, 300, 60)
+main_menu_button = pygame.Rect(WIDTH // 2 - 150, 410, 300, 60)
+pause_quit_button = pygame.Rect(WIDTH // 2 - 150, 490, 300, 60)
 
 seen_self_dialogues = set()
 dialogue_active = False
@@ -505,6 +509,21 @@ def draw_credits_screen():
 
     draw_button(back_button, "Back")
 
+def draw_pause_menu():
+    screen.fill((12, 12, 18))
+
+    title_text = title_font.render("PAUSED", True, (220, 220, 220))
+    title_rect = title_text.get_rect(center = (WIDTH // 2, 180))
+    screen.blit(title_text, title_rect)
+
+    subtitle_text = small_font.render("Take a break, detective.", True, (220, 220, 220))
+    subtitle_rect = subtitle_text.get_rect(center = (WIDTH // 2, 245))
+    screen.blit(subtitle_text, subtitle_rect)
+
+    draw_button(resume_button, "Resume")
+    draw_button(main_menu_button, "Main Menu")
+    draw_button(pause_quit_button, "Quit Game")
+
 #6. Main Game Loop
 running = True
 while running:
@@ -533,6 +552,20 @@ while running:
                     if back_button.collidepoint(event.pos):
                         game_state = "menu"
 
+                elif game_state == "playing":
+                    if game_exit_button.collidepoint(event.pos):
+                        running = False
+                
+                elif game_state == "pause":
+                    if resume_button.collidepoint(event.pos):
+                        game_state = "playing"
+                    
+                    elif main_menu_button.collidepoint(event.pos):
+                        game_state = "menu"
+
+                    elif pause_quit_button.collidepoint(event.pos):
+                        running = False
+
         if game_state == "playing":
             if event.type == pygame.KEYDOWN:
 
@@ -551,6 +584,9 @@ while running:
 
                             if current_quest:
                                 quest_log[current_quest] = "started"
+
+                elif event.key == pygame.K_ESCAPE:
+                    game_state = "pause"
 
                 elif event.key == pygame.K_SPACE:
                     if dialogue_active and dialogue_index < len(current_dialogue):
@@ -577,6 +613,10 @@ while running:
         continue
     elif game_state == "credits":
         draw_credits_screen()
+        pygame.display.update()
+        continue
+    elif game_state == "pause":
+        draw_pause_menu()
         pygame.display.update()
         continue
 
@@ -779,6 +819,7 @@ while running:
         hint = font.render("SPACE to continue", True, (200, 200, 200))
         screen.blit(hint, (box_rect.x + 20, box_rect.y + 105))
 
+        
     pygame.display.update()
 
 pygame.quit()
